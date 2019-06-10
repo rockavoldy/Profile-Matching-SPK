@@ -33,9 +33,8 @@
                             <th>Kriteria</th>
                             <th>Nilai</th>
                           </tr>
-                          <tr v-for="crit in kriteria" :key="crit.id">
+                          <tr v-for="(crit,i) in kriteria" :key="crit.id">
                             <td class="text-xs-left">
-                              <!-- <v-text-field :value="crit.deskripsi" readonly disabled></v-text-field> -->
                               <span class="title">{{ crit.deskripsi }}</span>
                             </td>
                             <td>
@@ -43,7 +42,7 @@
                                 label="Nilai"
                                 placeholder="Nilai"
                                 mask="#"
-                                v-model="formItem.nilai"
+                                v-model="crit.id"
                               ></v-text-field>
                             </td>
                           </tr>
@@ -110,14 +109,15 @@ export default {
     siswa: [],
     kriteria: [],
     editedIndex: -1,
-    formItem: {
-      nama: "",
-      persentase: ""
-    },
-    defaultItem: {
-      nama: "",
-      persentase: ""
-    }
+    formItem: [],
+    defaultItem: [],
+    tampung: [
+      {
+        id_siswa: "",
+        id_factor: "",
+        nilai: ""
+      }
+    ]
   }),
   mounted() {
     // this.$http.get("NilaiProfilController/" + this.id_aspek).then(response => {
@@ -151,7 +151,7 @@ export default {
       this.$http
         .get("KriteriaController/" + this.formItem.id_aspek)
         // .then(response => (this.kriteria = response.data.data));
-        .then(response => (this.kriteria = response.data.data));
+        .then(response => (this.head = response.data.data));
       //   axios
       //     .get("https://api.akhmad.id/pspk/AspekController/")
       //     .then(response => (this.aspek = response.data.data));
@@ -162,10 +162,14 @@ export default {
       const id_aspek = this.pilAspek[index].id;
       this.selectedAspek.id = id_aspek;
     },
+
     editItem(item) {
-      this.editedIndex = this.kriteria.indexOf(item);
+      const index = this.siswa.indexOf(item);
+      this.editedIndex = this.siswa.indexOf(item);
+      const id_siswa = this.siswa[index].id;
       this.formItem = Object.assign({}, item);
       this.dialog = true;
+      console.log(item);
     },
 
     close() {
@@ -173,30 +177,30 @@ export default {
       setTimeout(() => {
         this.formItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
-        this.getKriteria();
       }, 300);
     },
 
     save() {
       if (this.editedIndex > -1) {
         // Object.assign(this.kriteria[this.editedIndex], this.formItem);
-        const id_kriteria = this.kriteria[this.editedIndex].id;
-        this.$http.put("AspekController/" + id_kriteria, this.formItem);
+        // const id_kriteria = this.kriteria[this.editedIndex].id;
+        // this.$http.put("AspekController/" + id_kriteria, this.formItem);
         // axios.put(
         //   "https://api.akhmad.id/pspk/AspekController/" + id_kriteria,
         //   this.formItem
         // );
       } else {
-        this.$http.post("AspekController", {
-          nama: this.formItem.nama,
-          persentase: this.formItem.persentase
-        });
+        // this.$http.post("AspekController", {
+        //   nama: this.formItem.nama,
+        //   persentase: this.formItem.persentase
+        // });
         // axios.post("https://api.akhmad.id/pspk/AspekController/", {
         //   nama: this.formItem.nama,
         //   persentase: this.formItem.persentase
         // });
         // this.kriteria.push(this.formItem);
       }
+
       this.close();
     }
   }
