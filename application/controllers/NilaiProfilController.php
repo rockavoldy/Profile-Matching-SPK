@@ -9,7 +9,7 @@ class NilaiProfilController extends REST_Controller
         $this->load->model('ProfilModel');
     }
 
-    public function index_get($id_aspek = 0)
+    public function index_get($id_aspek = null)
     {
         $data = $this->ProfilModel->getKriteriaByAspek($id_aspek);
 
@@ -49,32 +49,23 @@ class NilaiProfilController extends REST_Controller
 
     public function index_post()
     {
-        $this->form_validation->set_rules('id_siswa', 'Siswa', 'required', array('required' => '%s harus ada !'));
-        $this->form_validation->set_rules('id_factor', 'Kriteria harus ada', 'required', array('required' => '%s harus ada !'));
+        $data = array(
+            'id_siswa' => $this->post('id_siswa', true),
+            'id_factor' => $this->post('id_factor', true),
+            'nilai' => $this->post('nilai', true)
+        );
 
-        if ($this->form_validation->run()) {
-            $data = array(
-                'id_siswa' => $this->post('id_siswa', true),
-                'id_factor' => $this->post('id_factor', true),
-                'nilai' => $this->post('nilai', true)
-            );
+        $response_post = $this->ProfilModel->addNilai($data);
 
-            $response_post = $this->ProfilModel->addNilai($data);
-
-            if ($response_post) {
-                $response = array(
-                    'status' => 200,
-                    'message' => 'Berhasil menambahkan nilai !',
-                    'data' => $data,
-                    'total_persentase' => $response_post
-                );
-            }
-        } else {
+        if ($response_post) {
             $response = array(
-                'status' => 403,
-                'message' => 'Nilai harus diisi !'
+                'status' => 200,
+                'message' => 'Berhasil menambahkan nilai !',
+                'data' => $data,
+                'total_persentase' => $response_post
             );
         }
+
 
         $this->response($response, $response['status']);
     }

@@ -35,7 +35,7 @@ class AspekModel extends CI_Model
         $this->db->where('id', $id);
         $response = $this->db->delete('tb_aspek');
 
-        if ($response->affected_rows() > 0) {
+        if ($this->db->affected_rows() > 0) {
             return true;
         }
 

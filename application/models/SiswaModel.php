@@ -9,6 +9,14 @@ class SiswaModel extends CI_Model
         return $data->result_array();
     }
 
+    function getSiswaById($id)
+    {
+        $this->db->where('id', $id);
+        $data = $this->db->get('tb_siswa');
+
+        return $data->row_array();
+    }
+
     function addSiswa($data)
     {
         return $this->db->insert('tb_siswa', $data);
@@ -24,9 +32,9 @@ class SiswaModel extends CI_Model
     function deleteSiswa($id)
     {
         $this->db->where('id', $id);
-        $response = $this->db->delete('tb_siswa');
+        $this->db->delete('tb_siswa');
 
-        if ($response->affected_rows() > 0) {
+        if ($this->db->affected_rows() > 0) {
             return true;
         }
 
