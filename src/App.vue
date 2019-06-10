@@ -1,28 +1,40 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <v-app>
+    <v-toolbar app>
+      <v-toolbar-title class="headline text-uppercase">
+        <span>Beasiswa</span>
+      </v-toolbar-title>
+      <v-btn flat to="/">
+        <span>Siswa</span>
+      </v-btn>
+      <v-btn flat to="/aspek">
+        <span>Aspek</span>
+      </v-btn>
+      <v-btn flat to="/kriteria">
+        <span>Kriteria</span>
+      </v-btn>
+      <v-btn flat to="/nilai">
+        <span>Nilai Profil Siswa</span>
+      </v-btn>
+      <v-btn flat to="/hitung">
+        <span>Perhitungan</span>
+      </v-btn>
+    </v-toolbar>
+
+    <v-content>
+      <router-view></router-view>
+    </v-content>
+  </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
+  name: "App",
+  components: {},
+  data() {
+    return {
+      //
+    };
   }
-}
+};
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
