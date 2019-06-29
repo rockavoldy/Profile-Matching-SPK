@@ -3,15 +3,10 @@ require APPPATH . 'libraries/REST_Controller.php';
 
 class NilaiProfilController extends REST_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->model('ProfilModel');
-    }
 
     public function siswa_get()
     {
-        $data = $this->ProfilModel->getSiswa();
+        $data = $this->profil->getSiswa();
 
         if ($data) {
             $response = array(
@@ -30,7 +25,7 @@ class NilaiProfilController extends REST_Controller
 
     public function index_get($id_aspek = null)
     {
-        $data = $this->ProfilModel->getKriteriaByAspek($id_aspek);
+        $data = $this->profil->getKriteriaByAspek($id_aspek);
 
         if ($data) {
             $response = array(
@@ -49,7 +44,7 @@ class NilaiProfilController extends REST_Controller
 
     public function aspek_get()
     {
-        $data = $this->ProfilModel->getAspek();
+        $data = $this->profil->getAspek();
 
         if ($data) {
             $response = array(
@@ -68,7 +63,7 @@ class NilaiProfilController extends REST_Controller
 
     public function raw_get()
     {
-        $data = $this->ProfilModel->getRaw();
+        $data = $this->profil->getRaw();
 
         if ($data) {
             $response = array(
@@ -95,7 +90,7 @@ class NilaiProfilController extends REST_Controller
         //     'raw_data' => $this->post('raw', true)
         // );
 
-        $response_post = $this->ProfilModel->rawNilai($data);
+        $response_post = $this->profil->rawNilai($data);
 
         if ($response_post) {
             $response = array(
@@ -118,7 +113,7 @@ class NilaiProfilController extends REST_Controller
             'nilai' => $this->post('nilai', true)
         );
 
-        $response_post = $this->ProfilModel->addNilai($data);
+        $response_post = $this->profil->addNilai($data);
 
         if ($response_post) {
             $response = array(

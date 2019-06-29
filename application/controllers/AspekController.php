@@ -3,19 +3,12 @@ require APPPATH . 'libraries/REST_Controller.php';
 
 class AspekController extends REST_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->load->model('AspekModel');
-    }
-
     public function index_get()
     {
-        $data = $this->AspekModel->getAspek();
+        $data = $this->aspek->getAspek();
 
         if ($data) {
-            $total = $this->AspekModel->getTotal();
+            $total = $this->aspek->getTotal();
             $response = array(
                 'status' => 200,
                 'data' => $data,
@@ -42,7 +35,7 @@ class AspekController extends REST_Controller
             'persentase' => $this->post('persentase', true)
         );
 
-        $response_post = $this->AspekModel->addAspek($data);
+        $response_post = $this->aspek->addAspek($data);
 
         if ($response_post) {
             $response = array(
@@ -69,7 +62,7 @@ class AspekController extends REST_Controller
             'persentase' => $this->put('persentase', true)
         );
 
-        $response_post = $this->AspekModel->editAspek($id_aspek, $data);
+        $response_post = $this->aspek->editAspek($id_aspek, $data);
 
         if ($response_post) {
             $response = array(
@@ -85,7 +78,7 @@ class AspekController extends REST_Controller
 
     function index_delete($id_aspek)
     {
-        if ($this->AspekModel->deleteAspek($id_aspek)) {
+        if ($this->aspek->deleteAspek($id_aspek)) {
             $response = array(
                 'status' => 200,
                 'message' => 'Berhasil dihapus !'

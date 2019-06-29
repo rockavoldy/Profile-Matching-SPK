@@ -3,19 +3,12 @@ require APPPATH . 'libraries/REST_Controller.php';
 
 class SiswaController extends REST_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->load->model('SiswaModel');
-    }
-
     public function index_get($id_siswa = null)
     {
         if (!$id_siswa) {
-            $data = $this->SiswaModel->getSiswa();
+            $data = $this->siswa->getSiswa();
         } else {
-            $data = $this->SiswaModel->getSiswaById($id_siswa);
+            $data = $this->siswa->getSiswaById($id_siswa);
         }
 
         if ($data) {
@@ -52,7 +45,7 @@ class SiswaController extends REST_Controller
             'asal_sekolah' => $this->post('asal_sekolah', true)
         );
 
-        $response_post = $this->SiswaModel->addSiswa($data);
+        $response_post = $this->siswa->addSiswa($data);
 
         if ($response_post) {
             $response = array(
@@ -75,7 +68,7 @@ class SiswaController extends REST_Controller
             'asal_sekolah' => $this->put('asal_sekolah', true)
         );
 
-        $response_post = $this->SiswaModel->editSiswa($id_siswa, $data);
+        $response_post = $this->siswa->editSiswa($id_siswa, $data);
 
         if ($response_post) {
             $response = array(
@@ -95,7 +88,7 @@ class SiswaController extends REST_Controller
 
     function index_delete($id_siswa)
     {
-        if ($this->SiswaModel->deleteSiswa($id_siswa)) {
+        if ($this->siswa->deleteSiswa($id_siswa)) {
             $response = array(
                 'status' => 200,
                 'message' => 'Berhasil dihapus !'

@@ -3,17 +3,10 @@ require APPPATH . 'libraries/REST_Controller.php';
 
 class KriteriaController extends REST_Controller
 {
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->load->model('KriteriaModel');
-    }
-
     public function index_get($id_aspek = null)
     {
         if ($id_aspek) {
-            $data = $this->KriteriaModel->getKriteriaById($id_aspek);
+            $data = $this->kriteria->getKriteriaById($id_aspek);
 
             if ($data) {
                 $response = array(
@@ -22,7 +15,7 @@ class KriteriaController extends REST_Controller
                 );
             }
         } else {
-            $data = $this->KriteriaModel->getKriteria();
+            $data = $this->kriteria->getKriteria();
 
             if ($data) {
                 $response = array(
@@ -50,7 +43,7 @@ class KriteriaController extends REST_Controller
             'nilai' => $this->post('nilai', true)
         );
 
-        $response_post = $this->KriteriaModel->addKriteria($data);
+        $response_post = $this->kriteria->addKriteria($data);
 
         if ($response_post) {
             $response = array(
@@ -73,7 +66,7 @@ class KriteriaController extends REST_Controller
             'nilai' => $this->put('nilai', true)
         );
 
-        $response_post = $this->KriteriaModel->editKriteria($id, $data);
+        $response_post = $this->kriteria->editKriteria($id, $data);
 
         if ($response_post) {
             $response = array(
@@ -89,7 +82,7 @@ class KriteriaController extends REST_Controller
 
     public function index_delete($id)
     {
-        if ($this->KriteriaModel->deleteKriteria($id)) {
+        if ($this->kriteria->deleteKriteria($id)) {
             $response = array(
                 'status' => 200,
                 'message' => 'Berhasil menghapus Kriteria !'
