@@ -9,6 +9,25 @@ class NilaiProfilController extends REST_Controller
         $this->load->model('ProfilModel');
     }
 
+    public function siswa_get()
+    {
+        $data = $this->ProfilModel->getSiswa();
+
+        if ($data) {
+            $response = array(
+                'status' => 200,
+                'data' => $data
+            );
+        } else {
+            $response = array(
+                'status' => 403,
+                'message' => 'Tidak ada siswa terdaftar !'
+            );
+        }
+
+        $this->response($response, $response['status']);
+    }
+
     public function index_get($id_aspek = null)
     {
         $data = $this->ProfilModel->getKriteriaByAspek($id_aspek);
@@ -43,6 +62,50 @@ class NilaiProfilController extends REST_Controller
                 'message' => 'Tidak ada data aspek !'
             );
         }
+
+        $this->response($response, $response['status']);
+    }
+
+    public function raw_get()
+    {
+        $data = $this->ProfilModel->getRaw();
+
+        if ($data) {
+            $response = array(
+                'status' => 200,
+                'data' => $data
+            );
+        } else {
+            $response = array(
+                'status' => 403,
+                'message' => 'Tidak ada data nilai !'
+            );
+        }
+
+        $this->response($response, $response['status']);
+    }
+
+    public function raw_post()
+    {
+
+        $data = $this->post();
+        // $data = array(
+        //     'id_siswa' => $this->post('id_siswa', true),
+        //     'id_factor' => $this->post('id_kriteria', true),
+        //     'raw_data' => $this->post('raw', true)
+        // );
+
+        $response_post = $this->ProfilModel->rawNilai($data);
+
+        if ($response_post) {
+            $response = array(
+                'status' => 200,
+                'message' => 'Berhasil menambahkan nilai !',
+                'data' => $data,
+                'total_persentase' => $response_post
+            );
+        }
+
 
         $this->response($response, $response['status']);
     }

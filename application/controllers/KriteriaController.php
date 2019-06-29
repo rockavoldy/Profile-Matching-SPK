@@ -18,10 +18,7 @@ class KriteriaController extends REST_Controller
             if ($data) {
                 $response = array(
                     'status' => 200,
-                    'data' => array(
-                        'text' => $data['deskripsi'],
-                        'value' => $data['id']
-                    ),
+                    'data' => $data
                 );
             }
         } else {
