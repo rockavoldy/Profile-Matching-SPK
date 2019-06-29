@@ -25,6 +25,11 @@ export default new Router({
             path: "/nilai",
             name: "profil",
             component: () => import("./components/Profil.vue")
+        },
+        {
+            path: "/hitung",
+            name: "hitung",
+            component: () => import("./components/Hitung.vue")
         }
         // {
         //     path: "/about",

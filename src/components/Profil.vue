@@ -2,206 +2,157 @@
   <v-container grid-list-md>
     <v-layout row wrap>
       <v-flex xs12>
-        <div>
-          <v-toolbar flat color="white">
-            <v-toolbar-title>Data Nilai Calon Penerima Beasiswa</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-dialog v-model="dialog" min-width="600px">
-              <v-card>
-                <v-card-title>
-                  <span class="headline">Edit Nilai Profil</span>
-                </v-card-title>
-
-                <v-card-text>
-                  <v-container grid-list-md>
-                    <v-layout wrap>
-                      <v-flex xs12>
-                        <v-select
-                          v-model="formItem.id_aspek"
-                          :items="pilAspek"
-                          item-text="nama"
-                          item-value="id"
-                          label="Aspek"
-                          solo
-                          required
-                          @change="getKriteria()"
-                        ></v-select>
-                      </v-flex>
-                      <v-flex xs12>
-                        <table width="100%" class="text-xs-center">
-                          <tr class="title" style="border: 1px">
-                            <th>Kriteria</th>
-                            <th>Nilai</th>
-                          </tr>
-                          <tr v-for="(crit,i) in kriteria" :key="crit.id">
-                            <td class="text-xs-left">
-                              <span class="title">{{ crit.deskripsi }}</span>
-                            </td>
-                            <td>
-                              <v-text-field
-                                label="Nilai"
-                                placeholder="Nilai"
-                                mask="#"
-                                v-model="crit.id"
-                              ></v-text-field>
-                            </td>
-                          </tr>
-                        </table>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-                  <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </v-toolbar>
-          <v-data-table :headers="head" :items="siswa" :pagination.sync="dataTable">
-            <template v-slot:items="props">
-              <td>{{ props.item.nisn }}</td>
-              <td>{{ props.item.nama }}</td>
-              <td>{{ props.item.asal_sekolah }}</td>
-              <td class="justify-center layout px-0">
-                <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
-              </td>
-            </template>
-          </v-data-table>
-        </div>
+        <v-toolbar flat color="white">
+          <v-toolbar-title>Data Nilai Calon Penerima Beasiswa</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-select
+            :items="pilAspek"
+            item-value="id"
+            item-text="nama"
+            @change="getKriteria"
+            label="Pilih Aspek"
+          ></v-select>
+        </v-toolbar>
+      </v-flex>
+      <v-flex xs12 color="white" class="px-1">
+        <table style="width: 100%; border-collapse: collapse" border="1" class="text-xs-center">
+          <tr>
+            <th>No.</th>
+            <th>NIM</th>
+            <th v-for="(itemHead, i) in head" :key="i">{{ itemHead.deskripsi }}</th>
+          </tr>
+          <tr v-for="(itemSiswa, i) in siswa" :key="i">
+            <td>{{ i+1 }}</td>
+            <td>{{ itemSiswa.nisn }}</td>
+            <td v-for="(n, j) in head" :key="j">
+              <!-- <span v-if="itemSiswa.nilai[(n-1)]">{{ itemSiswa.nilai[(n-1)] }}</span> -->
+              <input
+                type="text"
+                class="white px-2"
+                style="width: 100%"
+                placeholder="Nilai"
+                :name="n.id"
+                :id="itemSiswa.id"
+                @change="getInput"
+                v-model="inputValue[itemSiswa.id+'-raw-'+n.id]"
+                @keypress="isNumber($event)"
+                maxlength="12"
+              >
+              <!-- v-model="nilaiKirim[itemSiswa.id+'-'+n.id+'-raw']" -->
+              <!-- <input type="hidden" v-model="nilaiKirim['id_siswa'+i]" value="itemSiswa.id">
+              <input type="hidden" v-model="nilaiKirim['id_factor'+i]" value="n.id">-->
+            </td>
+            <!-- <td v-for="n in indexKriteria" :key="n">{{ i+','+(n-1) }}</td> -->
+          </tr>
+          <!-- <tr>
+            <td colspan="10">{{siswa}}</td>
+          </tr>
+          <tr>
+            <td colspan="10">{{nilaiKirim}}</td>
+          </tr>-->
+          <!-- <tr>
+            <td colspan="10">{{ inputValue }}</td>
+          </tr>-->
+        </table>
+        <v-btn color="info" @click="sendNilai">Simpan</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
 </template>
 
 <script>
-import axios from "axios";
 export default {
   data: () => ({
     pilAspek: [],
-    dataTable: {
-      rowsPerPage: -1
-    },
-    dialog: false,
-    head: [
-      {
-        text: "NISN",
-        value: "nisn"
-      },
-      {
-        text: "Nama",
-        value: "nama"
-      },
-      {
-        text: "Asal Sekolah",
-        value: "asal_sekolah"
-      },
-      {
-        text: "Aksi",
-        value: "aksi"
-      }
-    ],
-    selectedAspek: {
-      id: ""
-    },
-    id_aspek: "1",
+    head: [],
+    selectedAspek: {},
     siswa: [],
     kriteria: [],
-    editedIndex: -1,
-    formItem: [],
-    defaultItem: [],
-    tampung: [
-      {
-        id_siswa: "",
-        id_factor: "",
-        nilai: ""
-      }
-    ]
+    indexKriteria: null,
+    nilaiKirim: [],
+    inputValue: {},
+    isiKriteria: []
   }),
-  mounted() {
+  created() {
     // this.$http.get("NilaiProfilController/" + this.id_aspek).then(response => {
     //   this.head = response.data.data;
     // });
 
-    this.$http.get("SiswaController").then(response => {
+    this.$http.get("NilaiProfilController/siswa").then(response => {
       this.siswa = response.data.data;
+      // console.log(response.data.data);
     });
 
-    this.$http
-      .get("NilaiProfilController/aspek")
-      .then(response => (this.pilAspek = response.data.data));
-    // axios
-    //   .get("https://api.akhmad.id/pspk/AspekController/")
-    //   .then(response => (this.aspek = response.data.data));
-    // this.getKriteria();
+    this.$http.get("AspekController").then(response => {
+      // console.log(response.data.data);
+      this.pilAspek = response.data.data;
+    });
+
+    this.getRaw();
   },
   computed: {
     judulForm() {
       return this.editedIndex === -1 ? "Tambah Aspek" : "Edit Aspek";
     }
   },
-  watch: {
-    dialog(val) {
-      val || this.close();
-    }
-  },
   methods: {
-    getKriteria() {
-      this.$http
-        .get("KriteriaController/" + this.formItem.id_aspek)
-        // .then(response => (this.kriteria = response.data.data));
-        .then(response => (this.head = response.data.data));
-      //   axios
-      //     .get("https://api.akhmad.id/pspk/AspekController/")
-      //     .then(response => (this.aspek = response.data.data));
-    },
-
-    pilihItem(item) {
-      const index = this.pilAspek.indexOf(item);
-      const id_aspek = this.pilAspek[index].id;
-      this.selectedAspek.id = id_aspek;
-    },
-
-    editItem(item) {
-      const index = this.siswa.indexOf(item);
-      this.editedIndex = this.siswa.indexOf(item);
-      const id_siswa = this.siswa[index].id;
-      this.formItem = Object.assign({}, item);
-      this.dialog = true;
-      console.log(item);
-    },
-
-    close() {
-      this.dialog = false;
-      setTimeout(() => {
-        this.formItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      }, 300);
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        // Object.assign(this.kriteria[this.editedIndex], this.formItem);
-        // const id_kriteria = this.kriteria[this.editedIndex].id;
-        // this.$http.put("AspekController/" + id_kriteria, this.formItem);
-        // axios.put(
-        //   "https://api.akhmad.id/pspk/AspekController/" + id_kriteria,
-        //   this.formItem
-        // );
+    isNumber: function(evt) {
+      evt = evt ? evt : window.event;
+      var charCode = evt.which ? evt.which : evt.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57)
+        // charCode !== 46
+      ) {
+        evt.preventDefault();
       } else {
-        // this.$http.post("AspekController", {
-        //   nama: this.formItem.nama,
-        //   persentase: this.formItem.persentase
-        // });
-        // axios.post("https://api.akhmad.id/pspk/AspekController/", {
-        //   nama: this.formItem.nama,
-        //   persentase: this.formItem.persentase
-        // });
-        // this.kriteria.push(this.formItem);
+        return true;
       }
+    },
+    getRaw() {
+      this.$http.get("NilaiProfilController/raw").then(res => {
+        // this.isiKriteria = Object.assign({}, res.data.data);
+        this.inputValue = res.data.data;
+      });
+    },
+    getKriteria(selected) {
+      this.$http.get("KriteriaController/" + selected).then(response => {
+        // this.head = response.data.data;
+        // return response.data.data;
+        this.head = Object.assign({}, response.data.data);
+        this.indexKriteria = response.data.data.length;
 
-      this.close();
+        // console.log(this.indexKriteria);
+        // console.log(this.isiKriteria);
+        this.nilaiKirim = [];
+      });
+    },
+    getInput(input) {
+      // console.log(input.target.value); // isi input
+      // console.log(input.target.name); // id kriteria
+      // console.log(input.target.id); // id siswa
+      let data = {
+        id_siswa: input.target.id,
+        id_factor: input.target.name,
+        raw_data: input.target.value
+      };
+      // console.log(data);
+      this.nilaiKirim.push(data);
+      data = {};
+      // console.log(this.nilaiKirim);
+    },
+    sendNilai() {
+      let data = this.nilaiKirim;
+      setTimeout(() => {
+        for (let i = 0; i < data.length; i++) {
+          this.$http.post("NilaiProfilController/raw", {
+            id_siswa: data[i].id_siswa,
+            id_factor: data[i].id_factor,
+            raw_data: data[i].raw_data
+          });
+        }
+      }, 600);
+      alert("Berhasil di update");
     }
   }
 };
