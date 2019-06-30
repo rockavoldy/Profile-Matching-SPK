@@ -30,7 +30,7 @@ class HitungModel extends CI_Model
 
     function addNilaiFactor($data)
     {
-        $this->db->truncate('tb_nilai_factor');
+        $this->db->empty_table('tb_nilai_factor');
         if ($this->db->insert_batch('tb_nilai_factor', $data)) {
             return true;
         }
@@ -39,17 +39,8 @@ class HitungModel extends CI_Model
 
     function addGapNilaiFactor($data)
     {
-        $this->db->truncate('tb_gap_nilai_factor');
+        $this->db->empty_table('tb_gap_nilai_factor');
         if ($this->db->insert_batch('tb_gap_nilai_factor', $data)) {
-            return true;
-        }
-        return false;
-    }
-
-    function addNilaiAspek($data)
-    {
-        $this->db->truncate('tb_nilai_aspek');
-        if ($this->db->insert_batch('tb_nilai_aspek', $data)) {
             return true;
         }
         return false;
@@ -63,11 +54,6 @@ class HitungModel extends CI_Model
         $data_siswa = $siswa->result_array();
 
         foreach ($data_siswa as $sw) {
-            $data = null;
-            $data_aspek = null;
-            $data_factor = null;
-            $da = null;
-
             $this->db->select('tb_aspek.id as id_aspek, tb_aspek.persentase');
             $this->db->from('tb_gap_nilai_factor');
             $this->db->join('tb_factor', 'tb_gap_nilai_factor.id_factor = tb_factor.id', 'left');
@@ -76,8 +62,9 @@ class HitungModel extends CI_Model
             $this->db->group_by('tb_aspek.id');
             $aspek = $this->db->get();
             $data_aspek = $aspek->result_array();
+            $ds = $data_aspek;
 
-            foreach ($data_aspek as $da) {
+            foreach ($ds as $da) {
                 $this->db->select('id_factor, jenis, bobot');
                 $this->db->from('tb_gap_nilai_factor');
                 $this->db->join('tb_factor', 'tb_gap_nilai_factor.id_factor = tb_factor.id', 'left');
@@ -87,56 +74,19 @@ class HitungModel extends CI_Model
                 $factor = $this->db->get();
                 $data_factor = $factor->result_array();
 
+                // $data_factor['id_aspek'] = $da['id'];
                 $da['data'] = $data_factor;
-                $data[] = $da;
+                // $data_aspek['data'] = $data_aspek;
+                // $data_factor['data'] = $data_factor;
+                $dataa[] = array(
+                    'id_siswa' => $sw['id_siswa'],
+                    'data' => $da
+                );
             }
-
-            $dataa[] = array(
-                'id_siswa' => $sw['id_siswa'],
-                'data' => $data
-            );
         }
+
 
         // return $data->result_array();
         return $dataa;
-    }
-
-    function getHitung()
-    {
-        $this->db->select('id, nama, persentase');
-        $this->db->order_by('id');
-        $aspek = $this->db->get('tb_aspek');
-        $head[] = array(
-            'text' => 'Siswa',
-            'value' => 'siswa'
-        );
-        foreach ($aspek->result_array() as $data_aspek) {
-            $head[] = array(
-                'text' => $data_aspek['nama'] . " (" . $data_aspek['persentase'] . "%)",
-                'value' => $data_aspek['id']
-            );
-        }
-        $head[] = array(
-            'text' => 'Total',
-            'sortable' => true,
-            'value' => 'total'
-        );
-
-        $this->db->select('id, nisn, nama');
-        $siswa = $this->db->get('tb_siswa');
-        foreach ($siswa->result_array() as $sw) {
-            $this->db->select('id_aspek, nilai, ((persentase / 100) * nilai) as hasil');
-            $this->db->from('tb_aspek');
-            $this->db->join('tb_nilai_aspek', 'tb_aspek.id = tb_nilai_aspek.id_aspek', 'left');
-            $this->db->where('id_siswa', $sw['id']);
-            $this->db->order_by('id_aspek');
-            $aspek = $this->db->get();
-            $sw['data'] = $aspek->result_array();
-            $data['siswa'][] = $sw;
-        }
-
-        $data['head'] = $head;
-
-        return $data;
     }
 }

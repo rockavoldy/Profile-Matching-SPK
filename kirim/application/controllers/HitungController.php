@@ -6,7 +6,7 @@ class HitungController extends REST_Controller
     public function index_get()
     {
         // penyederhanaan nilai input user
-        $data = $this->getHitung();
+        $data = $this->setNilaiAspek();
         if ($data) {
             $response = array(
                 'status' => 200,
@@ -134,76 +134,30 @@ class HitungController extends REST_Controller
         $this->setGapNilaiFactor();
         $data = $this->hitung->getAspek();
 
-        foreach ($data as $siswa) {
-            $d = null;
-            foreach ($siswa['data'] as $aspek) {
-                $NCF = 0;
-                $NSF = 0;
-                $TCF = 0;
-                $TSF = 0;
-
-                $dd = null;
-                foreach ($aspek['data'] as $factor) {
-                    if ($factor['jenis'] == 'core') {
-                        $NCF += $factor['bobot'];
-                        $TCF++;
-                    } else {
-                        $NSF += $factor['bobot'];
-                        $TSF++;
-                    }
-                }
-                $nilai_total = $this->getNilaiTotal(array('NCF' => $NCF, 'NSF' => $NSF));
-                $dd = $aspek;
-                $dd['data'] = array(
-                    'id_aspek' => $aspek['id_aspek'],
-                    'NCF' => $NCF,
-                    'NSF' => $NSF,
-                    'TCF' => $TCF,
-                    'TSF' => $TSF,
-                    'nilai_total' => $nilai_total
-                );
-                $d[] = $dd;
-            }
-            $dat[] = array(
-                'id_siswa' => $siswa['id_siswa'],
-                'data' => $d
-            );
-        }
-
-        foreach ($dat as $ddd) {
-            foreach ($ddd['data'] as $sis) {
-                $kirim[] = array(
-                    'id_siswa' => $ddd['id_siswa'],
-                    'id_aspek' => $sis['data']['id_aspek'],
-                    'nilai' => $sis['data']['nilai_total']
-                );
-            }
-        }
-
-        $this->hitung->addNilaiAspek($kirim);
-
-        return $kirim;
-    }
-
-    private function getNilaiTotal($data)
-    {
-        $nilai_total = ((60 / 100) * $data['NCF']) + ((40 / 100) * $data['NSF']);
-        return $nilai_total;
-    }
-
-    private function getHitung()
-    {
-        $this->setNilaiAspek();
-        $data = $this->hitung->getHitung();
-
-        $kirim['head'] = $data['head'];
-        foreach ($data['siswa'] as $siswa) {
-            $siswa['total'] = 0;
-            foreach ($siswa['data'] as $dat) {
-                $siswa['total'] += (float) $dat['hasil'];
-            }
-            $kirim['siswa'][] = $siswa;
-        }
-        return $kirim;
+        // foreach ($data as $siswa) {
+        //     foreach ($siswa['data'] as $aspek) {
+        //         $NCF = 0;
+        //         $NSF = 0;
+        //         $TCF = 0;
+        //         $TSF = 0;
+        //         foreach ($aspek['data'] as $factor) {
+        //             if ($factor['jenis'] == 'core') {
+        //                 $NCF += $factor['bobot'];
+        //                 $TCF++;
+        //             } else {
+        //                 $NSF += $factor['bobot'];
+        //                 $TSF++;
+        //             }
+        //         }
+        //     }
+        //     $dat[] = array(
+        //         'id_siswa' => $siswa['id_siswa'],
+        //         'NCF' => $NCF,
+        //         'NSF' => $NSF,
+        //         'TCF' => $TCF,
+        //         'TSF' => $TSF
+        //     );
+        // }
+        return $data;
     }
 }
