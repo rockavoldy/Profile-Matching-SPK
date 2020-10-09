@@ -8,12 +8,12 @@ import Axios from "axios";
 Vue.config.productionTip = false;
 
 const base = Axios.create({
-    baseURL: "http://beasiswa.test"
+  baseURL: "http://api.test",
 });
 
 Vue.prototype.$http = base;
 
 new Vue({
-    router,
-    render: h => h(App)
+  router,
+  render: (h) => h(App),
 }).$mount("#app");
